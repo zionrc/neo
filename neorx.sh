@@ -8,11 +8,8 @@ export neorx_label=neo
 set -e
 
 case "${neorx_command}" in
-  setup)
+  upgrade|update|setup)
     curl -s https://neorx.github.io/neo/setup.sh?ts=$(date +%s) | bash -
-    ;;
-  push)
-    git add .; git commit -am "push"; git push
     ;;
   help|*)
     echo "Undefined command, use: push, setup."
