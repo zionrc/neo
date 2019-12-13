@@ -19,9 +19,9 @@ if [[ -z "${callable}" ]]; then
     exit 1
 fi
 
-echo ">>> Callable: ${callable}.sh"
+echo ">>> Callable: https://${callable}.sh"
 
-runnable=$(curl -s ${callable}.sh)
+runnable=$(curl -s https://${callable}.sh)
 #echo "${runnable}" | head -n2 | bash -
 #echo "${neorx_label}"
 #if [[ "${neorx_label}" != "$2" ]]; then

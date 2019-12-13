@@ -2,7 +2,7 @@
 export neorx_label=neo
 
 ##
-# neo(rx) file
+# neo(rx) bash file
 ##
 
 case "${neorx_command}" in
