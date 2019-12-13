@@ -35,6 +35,7 @@ fi
 echo ">>> Callable: https://${callable}.sh"
 
 runnable=$(curl -s "https://${callable}.sh?ts=$(date +%s)")
+
 #echo "${runnable}" | head -n2 | bash -
 #echo "${neorx_label}"
 #if [[ "${neorx_label}" != "$2" ]]; then
