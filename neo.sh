@@ -1,8 +1,11 @@
 #!/bin/bash
 
 ##
-#
-#
+# neo
+# ---
+# by Francesco Bianco
+# bianco@javanile.org
+# MIT License
 ##
 
 set -e
@@ -44,4 +47,10 @@ runnable=$(curl -s "https://${callable}.sh?ts=$(date +%s)")
 #fi
 
 export neorx_command=$1
-echo "${runnable}" | bash -
+if [[ "${neorx_mode}" == "print" ]]; then
+  echo "${runnable}"
+elif [[ "${neorx_mode}" == "debug" ]]; then
+  echo "${runnable}" | bash -x "${debug} -"
+else
+  echo "${runnable}" | bash "${debug} -"
+fi
