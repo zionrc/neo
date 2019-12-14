@@ -50,7 +50,7 @@ export neorx_command=$1
 if [[ "${neorx_mode}" == "print" ]]; then
   echo "${runnable}"
 elif [[ "${neorx_mode}" == "debug" ]]; then
-  echo "${runnable}" | bash -x "${debug} -"
+  echo "${runnable}" | bash -x -
 else
-  echo "${runnable}" | bash "${debug} -"
+  echo "${runnable}" | bash -
 fi
