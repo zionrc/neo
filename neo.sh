@@ -28,6 +28,8 @@ if [[ ${#2} -le 1 ]]; then
 fi
 
 if [[ -f "$2" ]]; then
+  runnable=$(cat "$2")
+else
   registry="${neorx_registry}/${2:0:1}/${2:1:1}?ts=$(date +%s)"
   callable=$(curl -s "${registry}" | grep -m1 "^$2 *" | cut -s -d' ' -f2)
   if [[ -z "${callable}" ]]; then
@@ -36,8 +38,6 @@ if [[ -f "$2" ]]; then
   fi
   echo ">>> Callable: https://${callable}.sh"
   runnable=$(curl -s "https://${callable}.sh?ts=$(date +%s)")
-else
-  runnable=$(cut "$2")
 fi
 
 #echo "${runnable}" | head -n2 | bash -
