@@ -23,21 +23,22 @@ if [[ -z "$2" ]]; then
 fi
 
 if [[ ${#2} -le 1 ]]; then
-    echo ">>> Label too short."
-    exit 1
+  echo ">>> Label too short."
+  exit 1
 fi
 
-registry="${neorx_registry}/${2:0:1}/${2:1:1}?ts=$(date +%s)"
-callable=$(curl -s "${registry}" | grep -m1 "^$2 *" | cut -s -d' ' -f2)
-
-if [[ -z "${callable}" ]]; then
+if [[ -f "$2" ]]; then
+  registry="${neorx_registry}/${2:0:1}/${2:1:1}?ts=$(date +%s)"
+  callable=$(curl -s "${registry}" | grep -m1 "^$2 *" | cut -s -d' ' -f2)
+  if [[ -z "${callable}" ]]; then
     echo ">>> Label '$2' not in registry."
     exit 1
+  fi
+  echo ">>> Callable: https://${callable}.sh"
+  runnable=$(curl -s "https://${callable}.sh?ts=$(date +%s)")
+else
+  runnable=$(cut "$2")
 fi
-
-echo ">>> Callable: https://${callable}.sh"
-
-runnable=$(curl -s "https://${callable}.sh?ts=$(date +%s)")
 
 #echo "${runnable}" | head -n2 | bash -
 #echo "${neorx_label}"
