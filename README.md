@@ -1,6 +1,6 @@
 # neo
 
-![neo](https://giphy.com/embed/MgkBTmxt18lGg)
+![neo](neo.gif)
 
 ## Get started
 
