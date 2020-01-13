@@ -2,7 +2,7 @@
 
 ![neo](neo.gif)
 
-**!!!READ THIS https://dev.to/francescobianco/matrix-public-task-runner-1ek2**
+**🐇 read this https://dev.to/francescobianco/matrix-public-task-runner-1ek2**
 
 ## Get started
 
