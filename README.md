@@ -5,7 +5,7 @@
 ## Get started
 
 ```bash
-curl -s https://git.io/zion | bash -
+curl -sL git.io/zion | sudo bash -
 ```
 
 ```bash
@@ -15,9 +15,9 @@ neo run matrix
 ## Url shortening
 
 ```bash
-curl -i https://git.io \    
+curl -i https://git.io \
      -F "url=https://raw.githubusercontent.com/zionrc/neo/master/setup.sh" \
-     -F "code=zion" 
+     -F "code=zion"
 ```
 
 
