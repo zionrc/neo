@@ -10,6 +10,7 @@
 
 set -e
 
+show=
 debug=
 verbose=
 usecache=
@@ -17,7 +18,7 @@ registry=https://zionrc.github.io/registry/tag/neo
 signature=https://raw.githubusercontent.com/zionrc/neo/master/neo.sig
 checksum=$(curl -s "${signature}?ts=$(date +%s)" || true)
 hint="try 'neo --help' for more information"
-version=9
+version=10
 
 info () {
     [[ -z ${verbose} ]] || echo -e "\e[33mneo: $1\e[0m"
@@ -36,7 +37,19 @@ warning () {
 
 usage () {
     echo "Usage: neo [OPTION]... COMMAND TAG [ARGUMENT]..."
-    echo "Run command and tag from public registry https://github.com/zionrc/registry"
+    echo "       neo [OPTION]... -s TAG"
+    echo ""
+    echo "Run COMMAND and TAG from public registry https://github.com/zionrc/registry"
+    echo ""
+    echo "List of available options"
+    echo "  -x          Debug running script"
+    echo "  -v          Display log"
+    echo "  -c          Use cache"
+    echo "  -s TAG      Show script from tag"
+    echo "  -h, --help  Display this help and exit"
+    echo "  --version   Display neo version"
+    echo ""
+    echo "Documentation can be found at https://github.com/zionrc/neo"
     exit 1
 }
 
@@ -45,21 +58,42 @@ version () {
     exit 1
 }
 
+show () {
+    cat $1
+    exit 0
+}
+
 [[ "$1" == "--help" ]] && usage
 [[ "$1" == "--version" ]] && version
 
-while getopts "hcxv" opt &> /dev/null; do
+while getopts "hs:cxv" opt &> /dev/null; do
     last=$(( OPTIND-1 ))
     case "${opt}" in
-        h) usage ;;
-        x) debug=-x ;;
-        v) verbose=1 ;;
-        c) usecache=1 ;;
-        ?) error 2 "illegal option '${!last}', ${hint}." ;;
+        "h")
+            usage ;;
+        "s")
+            show=${OPTARG} ;;
+        "x")
+            debug=-x ;;
+        "v")
+            verbose=1 ;;
+        "c")
+            usecache=1 ;;
+        "?")
+            case "${!last}" in
+                "-s")
+                    error 2 "option '${!last}' require tag name, ${hint}." ;;
+                *)
+                    error 2 "illegal option '${!last}', ${hint}." ;;
+            esac ;;
     esac
 done
 
 shift $(( OPTIND-1 ))
+if [[ ! -z "${show}" ]]; then
+    [[ ${#} -gt 0 ]] && error 2 "option '-s' too many arguments, ${hint}."
+    set -- "show" "${show}"
+fi
 
 [[ -z "$1" ]] && error 2 "requires command and tag, ${hint}."
 [[ -z "$2" ]] && error 2 "requires tag, ${hint}."
@@ -106,7 +140,8 @@ else
 fi
 
 ## Check cache file
-[[ -f ${cache} ]] || error 3 "cache file '${cache}' not found."
+[[ -f "${cache}" ]] || error 3 "cache file '${cache}' not found."
+[[ -z "${show}" ]] || show ${cache}
 
 ## Prepare script header
 header="set -- \"$1\""

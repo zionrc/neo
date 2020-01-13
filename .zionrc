@@ -16,7 +16,7 @@ case "$1" in
     upgrade|update|setup)
         curl -s "https://raw.githubusercontent.com/zionrc/neo/master/setup.sh?ts=$(date +%s)" | bash -
         ;;
-  help|*)
+    help|*)
         echo "Undefined command, use: upgrade, update, setup."
         ;;
 esac
