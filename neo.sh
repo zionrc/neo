@@ -13,10 +13,11 @@ set -e
 debug=
 verbose=
 usecache=
-registry=https://zionrc.github.io/registry/tag
+registry=https://zionrc.github.io/registry/tag/neo
 signature=https://raw.githubusercontent.com/zionrc/neo/master/neo.sig
 checksum=$(curl -s "${signature}?ts=$(date +%s)" || true)
 hint="try 'neo --help' for more information"
+version=5
 
 info () {
     [[ -z ${verbose} ]] || echo -e "\e[33mneo: $1\e[0m"
@@ -54,6 +55,11 @@ done
 
 shift $(( OPTIND-1 ))
 
+[[ -z "$1" ]] && error 2 "requires command and tag, ${hint}."
+[[ -z "$2" ]] && error 2 "requires tag, ${hint}."
+
+[[ ${#2} -le 1 ]] && error 2 "tag '${2}' is too short, type at least 2 letters."
+
 info "(checksum) ${checksum}"
 
 if [[ -z "${usecache}" ]]; then
@@ -65,11 +71,6 @@ if [[ -z "${usecache}" ]]; then
         fi
     fi
 fi
-
-[[ -z "$1" ]] && error 2 "requires command and tag, ${hint}."
-[[ -z "$2" ]] && error 2 "requires tag, ${hint}."
-
-[[ ${#2} -le 1 ]] && error 2 "tag '${2}' is too short, type at least 2 letters."
 
 if [[ -f "$2" ]]; then
     script="$2"
