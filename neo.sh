@@ -17,7 +17,7 @@ registry=https://zionrc.github.io/registry/tag/neo
 signature=https://raw.githubusercontent.com/zionrc/neo/master/neo.sig
 checksum=$(curl -s "${signature}?ts=$(date +%s)" || true)
 hint="try 'neo --help' for more information"
-version=5
+version=6
 
 info () {
     [[ -z ${verbose} ]] || echo -e "\e[33mneo: $1\e[0m"

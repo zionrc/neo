@@ -1,6 +1,6 @@
 #!/bin/bash
 
-current=$(grep -e "^version=[0-9]+" neo.sh)
+current=$(grep -e "^version=" neo.sh)
 version=$(( $(echo ${current} | cut -s -d'=' -f2) + 1 ))
 
 echo ${current} ${version}
