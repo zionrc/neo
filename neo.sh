@@ -40,7 +40,13 @@ usage () {
     exit 1
 }
 
+version () {
+    echo "neo: (version=${version})"
+    exit 1
+}
+
 [[ "$1" == "--help" ]] && usage
+[[ "$1" == "--version" ]] && version
 
 while getopts "hcxv" opt &> /dev/null; do
     last=$(( OPTIND-1 ))
