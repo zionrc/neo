@@ -3,6 +3,8 @@
 current=$(grep -e "^version=[0-9]+" neo.sh)
 version=$(( $(echo ${current} | cut -s -d'=' -f2) + 1 ))
 
+echo ${current} ${version}
+
 sed -i "s/${current}/version=${version}/" neo.sh
 
 sha256sum neo.sh | cut -s -d' ' -f1 > neo.sig
