@@ -1,5 +1,4 @@
 #!/bin/bash
-export neorx_label=neo
 
 ##
 # neo
@@ -11,11 +10,13 @@ export neorx_label=neo
 
 set -e
 
-case "${neorx_command}" in
-  upgrade|update|setup)
-    curl -s "https://neorx.github.io/neo/setup.sh?ts=$(date +%s)" | bash -
-    ;;
+echo $1
+
+case "$1" in
+    upgrade|update|setup)
+        curl -s "https://raw.githubusercontent.com/zionrc/neo/master/setup.sh?ts=$(date +%s)" | bash -
+        ;;
   help|*)
-    echo "Undefined command, use: push, setup."
-    ;;
+        echo "Undefined command, use: upgrade, update, setup."
+        ;;
 esac

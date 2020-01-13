@@ -17,7 +17,7 @@ registry=https://zionrc.github.io/registry/tag/neo
 signature=https://raw.githubusercontent.com/zionrc/neo/master/neo.sig
 checksum=$(curl -s "${signature}?ts=$(date +%s)" || true)
 hint="try 'neo --help' for more information"
-version=7
+version=8
 
 info () {
     [[ -z ${verbose} ]] || echo -e "\e[33mneo: $1\e[0m"
@@ -79,8 +79,7 @@ if [[ -z "${usecache}" ]]; then
 fi
 
 if [[ -f "$2" ]]; then
-    script="$2"
-    source=$(cat "${script}")
+    cache="$2"
 else
     cache="${HOME}/.zionrc_cache/$2"
     info "(cache) ${cache}"
@@ -109,9 +108,9 @@ fi
 [[ -f ${cache} ]] || error 3 "cache file '${cache}' not found."
 
 ## Prepare script header
-header="set -- \"${cache}\" \"$1\""
+header="set -- \"$1\""
 for arg in "${@:3}"; do header+=" \"${arg}\""; done
 info "(header) ${header}"
 
 ## Execute script
-bash ${debug} - <( echo "${heaeder}"; cat "${cache}" )
+bash ${debug} - <( echo "${header}"; cat "${cache}" )
