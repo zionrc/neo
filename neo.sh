@@ -14,20 +14,23 @@ debug=
 verbose=
 usecache=
 registry=https://zionrc.github.io/registry/tag
-checksum=https://raw.githubusercontent.com/zionrc/neo/master/neo.sig
-status=$(curl -s "${checksum}?ts=$(date +%s)" || true)
+signature=https://raw.githubusercontent.com/zionrc/neo/master/neo.sig
+checksum=$(curl -s "${signature}?ts=$(date +%s)" || true)
 hint="try 'neo --help' for more information"
 
-echo "S: ${status}"
-
 info () {
-    [[ -z ${verbose} ]] || echo -e "\e[33minfo: $1\e[0m"
+    [[ -z ${verbose} ]] || echo -e "\e[33mneo: $1\e[0m"
     return 0
 }
 
 error () {
     echo -e "\e[31mneo: $2\e[0m"
     exit $1
+}
+
+warning () {
+    echo -e "\e[31mneo: $1\e[0m"
+    return 0
 }
 
 usage () {
@@ -44,19 +47,21 @@ while getopts "hcxv" opt &> /dev/null; do
         h) usage ;;
         x) debug=-x ;;
         v) verbose=1 ;;
-        v) usecache=1 ;;
+        c) usecache=1 ;;
         ?) error 2 "illegal option '${!last}', ${hint}." ;;
     esac
 done
 
 shift $(( OPTIND-1 ))
 
+info "(checksum) ${checksum}"
+
 if [[ -z "${usecache}" ]]; then
-    if [[ -z "${status}" ]]; then
+    if [[ -z "${checksum}" ]]; then
         error 3 "you are offline, use '-c' option to run from cache."
     else
         if [[ "$(sha256sum $0)" != "${checksum}  $0" ]]; then
-            error 4 "neo checksum error, upgrade to latest version."
+            warning "checksum error, upgrade to latest version."
         fi
     fi
 fi
@@ -70,28 +75,34 @@ if [[ -f "$2" ]]; then
     script="$2"
     source=$(cat "${script}")
 else
-    page="${registry}/${2:0:1}/${2:1:1}"
-    line="$(curl -s "${page}?ts=$(date +%s)" | grep -m1 "^$2 *" || true)"
-
-    if [[ -z "${line}" ]]; then
-        error 3 "tag '$2' not found on '${page}' page."
-    fi
-
     cache="${HOME}/.zionrc_cache/$2"
-    script="$(echo ${line} | cut -s -d' ' -f2)"
-    hash="$(echo ${line} | cut -s -d' ' -f3)"
+    info "(cache) ${cache}"
 
-    mkdir -p "${HOME}/.zionrc_cache"
-    info "curl: ${script}"
-    curl -o ${cache} -s "${script}?ts=$(date +%s)"
+    if [[ -z ${usecache} ]]; then
+        page="${registry}/${2:0:1}/${2:1:1}"
+        line="$(curl -s "${page}?ts=$(date +%s)" | grep -m1 "^$2 *" || true)"
 
-    if [[ "$(sha256sum ${cache})" != "${hash}  ${cache}" ]]; then
-        error 3 "tag '$2' checksum error."
+        if [[ -z "${line}" ]]; then
+            error 3 "tag '$2' not found on '${page}' page."
+        fi
+
+        file="$(echo ${line} | cut -s -d' ' -f2)"
+        hash="$(echo ${line} | cut -s -d' ' -f3)"
+
+        info "curl: ${file}"
+        mkdir -p "${HOME}/.zionrc_cache"
+        curl -o ${cache} -s "${file}?ts=$(date +%s)" || true
+
+        if [[ "$(sha256sum ${cache})" != "${hash}  ${cache}" ]]; then
+            error 3 "tag '$2' checksum error."
+        fi
     fi
 fi
 
+[[ -f ${cache} ]] || error 3 "cache file '${cache}' not found."
+
 ## Prepare script header
-header="set -- \"${script}\" \"$1\""
+header="set -- \"${cache}\" \"$1\""
 for arg in "${@:3}"; do header+=" \"${arg}\""; done
 info "(header) ${header}"
 
