@@ -7,6 +7,7 @@ sed -i "s/${current}/version=${version}/" neo.sh
 
 sha256sum neo.sh | cut -s -d' ' -f1 > neo.sig
 
+git pull
 git add .
 git commit -am "Release (version=${version})"
 git push
