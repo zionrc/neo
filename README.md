@@ -12,6 +12,10 @@ curl -sL git.io/zion | sudo bash -
 neo run matrix
 ```
 
+## Testing
+
+docker-compose run --rm test
+
 ## Url shortening
 
 ```bash

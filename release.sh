@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 current=$(grep -e "^version=" neo.sh)
 version=$(( $(echo ${current} | cut -s -d'=' -f2) + 1 ))

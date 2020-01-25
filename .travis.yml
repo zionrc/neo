@@ -1,0 +1,18 @@
+os: linux
+group: stable
+dist: trusty
+sudo: required
+language: generic
+
+env:
+  - DOCKER_COMPOSE_VERSION=1.22.0
+
+before_install:
+  - curl -sL https://git.io/zion | bash -
+  - neo install docker-compose -v ${DOCKER_COMPOSE_VERSION}
+
+script:
+  - docker-compose run --rm bash ./test.sh
+
+after_success:
+  - curl -sL https://codecov.io/bash | bash -

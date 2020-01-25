@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 ##
 # neo
@@ -10,13 +10,33 @@
 
 set -e
 
-neo_bin=/usr/local/bin/neo
-neo_src=https://raw.githubusercontent.com/zionrc/neo/master/neo.sh
+##
+#
+##
+run_as_root() {
+  local CMD="$*"
 
-echo "Get: ${neo_src} -> ${neo_bin}"
-curl --progress-bar -sLo "${neo_bin}" "${neo_src}?ts=$(date +%s)"
+  if [[ $EUID -ne 0 ]]; then
+    CMD="sudo $CMD"
+  fi
 
-echo "Inf: set file permission to ${neo_bin}"
-chmod +x ${neo_bin}
+  $CMD
+}
 
-echo "Done."
+##
+#
+##
+main() {
+  local neo_bin=/usr/local/bin/neo
+  local neo_src=https://raw.githubusercontent.com/zionrc/neo/master/neo.sh
+
+  echo -e "\e[43m\e[97m\e[1m INFO \e[0m Installing 'neo' as root..."
+  run_as_root curl -sLo "${neo_bin}" "${neo_src}?ts=$(date +%s)"
+  run_as_root chmod 700 "${neo_bin}"
+  echo -e "\e[42m\e[97m\e[1m DONE \e[0m Type 'neo get info' to begin."
+}
+
+##
+#
+##
+main "$@"
