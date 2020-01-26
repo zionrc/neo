@@ -12,6 +12,7 @@ git add .
 git commit -am "Release (version=${version})"
 git push
 
-sleep 5
+sleep 10
 
-curl -s https://raw.githubusercontent.com/zionrc/neo/master/setup.sh?ts=$(date +%s) | sudo bash -
+echo "Installing 'neo' as root..."
+curl -sL https://raw.githubusercontent.com/zionrc/neo/master/setup.sh?ts=$(date +%s) | sudo bash -
