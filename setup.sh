@@ -32,7 +32,8 @@ main() {
 
   echo -e "\e[43m\e[97m\e[1m INFO \e[0m Installing 'neo' as root..."
   run_as_root curl -sLo "${neo_bin}" "${neo_src}?ts=$(date +%s)"
-  run_as_root chmod 700 "${neo_bin}"
+  run_as_root chmod 755 "${neo_bin}"
+  run_as_root chown 0:0 "${neo_bin}"
   echo -e "\e[42m\e[97m\e[1m DONE \e[0m Type 'neo get info' to begin."
 }
 
