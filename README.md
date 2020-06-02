@@ -2,7 +2,7 @@
 
 🐇 **[`Follow the white rabbit.`](https://dev.to/francescobianco/matrix-public-task-runner-1ek2)**
 
-Neo is the command-line utilty behind [Zionrc](https://zionrc.github.io) project.
+Neo is the command-line utility behind [Zionrc](https://zionrc.github.io) project.
 
 ![neo](neo.gif)
 
