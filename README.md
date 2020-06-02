@@ -2,11 +2,13 @@
 
 🐇 **[`Follow the white rabbit.`](https://dev.to/francescobianco/matrix-public-task-runner-1ek2)**
 
+[![Build Status](https://travis-ci.org/zionrc/neo.svg?branch=master)](https://travis-ci.org/zionrc/neo)
+
 Neo is the command-line utility behind [Zionrc](https://zionrc.github.io) project.
 
 ![neo](neo.gif)
 
-## Install
+## Installation
 
 ```bash
 curl -sL git.io/zion | sudo bash -
