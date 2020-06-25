@@ -14,7 +14,7 @@ show=
 debug=
 verbose=
 usecache=
-registry=https://zionrc.github.io/registry/tag/neo
+registry=https://zionrc.github.io/index/tag/neo
 signature=https://raw.githubusercontent.com/zionrc/neo/master/neo.sig
 checksum=$(curl -s "${signature}?ts=$(date +%s)" || true)
 hint="try 'neo --help' for more information"
@@ -39,7 +39,7 @@ usage () {
     echo "Usage: neo [OPTION]... COMMAND TAG [ARGUMENT]..."
     echo "       neo [OPTION]... -s TAG"
     echo ""
-    echo "Run COMMAND and TAG from public registry https://github.com/zionrc/registry"
+    echo "Run COMMAND and TAG from public registry https://github.com/zionrc/index"
     echo ""
     echo "List of available options"
     echo "  -x          Debug running script"
