@@ -18,6 +18,7 @@ registry=https://zionrc.github.io/index/tag/neo
 signature=https://raw.githubusercontent.com/zionrc/neo/master/SHA256SUMS
 checksum=$(curl -s "${signature}?ts=$(date +%s)" | grep neo.sh || true)
 hint="try 'neo --help' for more information"
+home=${HOME}/.zionrc/neo
 version=0.0.17
 
 info () {
@@ -31,7 +32,7 @@ error () {
 }
 
 warning () {
-    echo "neo: $1"
+    echo "WARNING! $1"
     return 0
 }
 
@@ -112,7 +113,7 @@ if [[ -z "${usecache}" ]]; then
         error 3 "you are offline, use '-c' option to run from cache."
     else
         if [[ "$(sha256sum $0)" != "${checksum}  $0" ]]; then
-            warning "checksum error, upgrade to latest version."
+            warning "Checksum error, upgrade to latest version."
         fi
     fi
 fi
@@ -121,29 +122,33 @@ if [[ -f "$2" ]]; then
     matrix=$(cat $2)
 elif [[ -z ${cache} ]]; then
     page="${registry}/${2:0:1}/${2:1:1}"
-    line="$(curl -s "${page}?ts=$(date +%s)" | grep -m1 "^$2 *" || true)"
+    track="$(curl -s "${page}?ts=$(date +%s)" | grep -m1 "^$2 *" || true)"
 
-    if [[ -z "${line}" ]]; then
+    if [[ -z "${track}" ]]; then
         error 3 "tag '$2' not found on '${page}' page."
     fi
 
-    matrix="$(echo ${line} | cut -s -d' ' -f2)"
-    checksum="$(echo ${line} | cut -s -d' ' -f3)"
-    cache="${HOME}/.zionrc/neo/cache/$2"
-    info "curl: ${file}"
+    matrix="$(echo ${track} | cut -s -d' ' -f2)"
+    checksum="$(echo ${track} | cut -s -d' ' -f3)"
+    status=$(curl -sLI "${matrix}?ts=$(date +%s)" | grep "HTTP/1.1" | tail -1 | tr -dc 0-9 | tail -c 3)
+    cache="${home}/cache/$2"
 
-    matrix=$(curl -s "${matrix}?ts=$(date +%s)" || true)
+    if [[ "${status}" != "200" ]]; then
+        error 4 "resource '${matrix}' bad http status ${status} required 200."
+    fi
 
-    mkdir -p "$(diname "${cache}")"
-    echo "${matrix}" > ${cache}
+    matrix=$(curl -s "${matrix}?ts=$(date +%s)")
 
-    if [[ "$(sha256sum ${cache})" != "${hash}  ${cache}" ]]; then
-        error 3 "tag '$2' checksum error."
+    mkdir -p "$(dirname "${cache}")"
+    echo "${matrix}" > "${cache}"
+
+    if [[ "$(sha256sum ${cache})" != "${checksum} ${cache}" ]]; then
+        warning "Tag '$2' checksum error."
     fi
 else
-    cache="${HOME}/.zionrc/neo/cache/$2"
+    cache="${home}/cache/$2"
     [[ -f "${cache}" ]] || error 3 "cache file '${cache}' not found."
     matrix=$(cat "${cache}")
 fi
 
-echo "${matrix}" | bash ${debug} -s -- "${@:2}"
+echo "${matrix}" | bash ${debug} -s -- "$1" "${@:3}"
