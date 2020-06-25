@@ -1,6 +1,6 @@
 #!make
 
-.PHONY: sha256sums
+.PHONY: sha256sums test
 
 sha256sums:
 	find * -type f -exec sha256sum "{}" + > SHA256SUMS
@@ -17,7 +17,10 @@ push: sha256sums
 	git commit -am "Release (version=${version})"
 	git push
 
+test:
+	bash test/setup-test.sh
+
 release-and-install: bump-version push
 	echo "Installing 'neo' as root..."
-	sleep 10
+	@sleep 10
 	curl -sL https://raw.githubusercontent.com/zionrc/neo/master/setup.sh?ts=$(date +%s) | sudo bash -

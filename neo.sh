@@ -11,32 +11,33 @@
 set -e
 
 show=
+cache=
 debug=
 verbose=
-usecache=
 registry=https://zionrc.github.io/index/tag/neo
-signature=https://raw.githubusercontent.com/zionrc/neo/master/neo.sig
-checksum=$(curl -s "${signature}?ts=$(date +%s)" || true)
+signature=https://raw.githubusercontent.com/zionrc/neo/master/SHA256SUMS
+checksum=$(curl -s "${signature}?ts=$(date +%s)" | grep neo.sh || true)
 hint="try 'neo --help' for more information"
-version=17
+version=0.0.17
 
 info () {
-    [[ -z ${verbose} ]] || echo -e "\e[33mneo: $1\e[0m"
+    [[ -z ${verbose} ]] || echo "neo: $1"
     return 0
 }
 
 error () {
-    echo -e "\e[31mneo: $2\e[0m"
+    echo "neo: $2"
     exit $1
 }
 
 warning () {
-    echo -e "\e[31mneo: $1\e[0m"
+    echo "neo: $1"
     return 0
 }
 
 usage () {
     echo "Usage: neo [OPTION]... COMMAND TAG [ARGUMENT]..."
+    echo "       neo [OPTION]... COMMAND"
     echo "       neo [OPTION]... -s TAG"
     echo ""
     echo "Run COMMAND and TAG from public registry https://github.com/zionrc/index"
@@ -78,7 +79,7 @@ while getopts "hs:cxv" opt &> /dev/null; do
         "v")
             verbose=1 ;;
         "c")
-            usecache=1 ;;
+            cache=1 ;;
         "?")
             case "${!last}" in
                 "-s")
@@ -96,7 +97,11 @@ if [[ ! -z "${show}" ]]; then
 fi
 
 [[ -z "$1" ]] && error 2 "requires command and tag, ${hint}."
-[[ -z "$2" ]] && error 2 "requires tag, ${hint}."
+
+if [[ -z "$2" ]]; then
+    info "(implicit) $1"
+    set -- __implict__ $1
+fi
 
 [[ ${#2} -le 1 ]] && error 2 "tag '${2}' is too short, type at least 2 letters."
 
@@ -113,12 +118,12 @@ if [[ -z "${usecache}" ]]; then
 fi
 
 if [[ -f "$2" ]]; then
-    cache="$2"
+    cache=$(cat $2)
 else
     cache="${HOME}/.zionrc_cache/$2"
     info "(cache) ${cache}"
 
-    if [[ -z ${usecache} ]]; then
+    if [[ -z ${cache} ]]; then
         page="${registry}/${2:0:1}/${2:1:1}"
         line="$(curl -s "${page}?ts=$(date +%s)" | grep -m1 "^$2 *" || true)"
 
@@ -139,14 +144,4 @@ else
     fi
 fi
 
-## Check cache file
-[[ -f "${cache}" ]] || error 3 "cache file '${cache}' not found."
-[[ -z "${show}" ]] || show ${cache}
-
-## Prepare script header
-header="set -- \"$1\""
-for arg in "${@:3}"; do header+=" \"${arg}\""; done
-info "(header) ${header}"
-
-## Execute script
-bash ${debug} - <( echo "${header}"; cat "${cache}" )
+echo "${cache}" | bash ${debug} -s -- "${@:2}"
