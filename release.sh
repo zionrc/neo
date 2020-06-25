@@ -5,7 +5,7 @@ version=$(( $(echo ${current} | cut -s -d'=' -f2) + 1 ))
 
 sed -i "s/${current}/version=${version}/" neo.sh
 
-sha256sum neo.sh | cut -s -d' ' -f1 > neo.sig
+find * -type f -exec sha256sum "{}" + > SHA256SUMS
 
 git pull
 git add .
