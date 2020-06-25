@@ -118,30 +118,32 @@ if [[ -z "${usecache}" ]]; then
 fi
 
 if [[ -f "$2" ]]; then
-    cache=$(cat $2)
-else
-    cache="${HOME}/.zionrc_cache/$2"
-    info "(cache) ${cache}"
+    matrix=$(cat $2)
+elif [[ -z ${cache} ]]; then
+    page="${registry}/${2:0:1}/${2:1:1}"
+    line="$(curl -s "${page}?ts=$(date +%s)" | grep -m1 "^$2 *" || true)"
 
-    if [[ -z ${cache} ]]; then
-        page="${registry}/${2:0:1}/${2:1:1}"
-        line="$(curl -s "${page}?ts=$(date +%s)" | grep -m1 "^$2 *" || true)"
-
-        if [[ -z "${line}" ]]; then
-            error 3 "tag '$2' not found on '${page}' page."
-        fi
-
-        file="$(echo ${line} | cut -s -d' ' -f2)"
-        hash="$(echo ${line} | cut -s -d' ' -f3)"
-
-        info "curl: ${file}"
-        mkdir -p "${HOME}/.zionrc_cache"
-        curl -o ${cache} -s "${file}?ts=$(date +%s)" || true
-
-        if [[ "$(sha256sum ${cache})" != "${hash}  ${cache}" ]]; then
-            error 3 "tag '$2' checksum error."
-        fi
+    if [[ -z "${line}" ]]; then
+        error 3 "tag '$2' not found on '${page}' page."
     fi
+
+    matrix="$(echo ${line} | cut -s -d' ' -f2)"
+    checksum="$(echo ${line} | cut -s -d' ' -f3)"
+    cache="${HOME}/.zionrc/neo/cache/$2"
+    info "curl: ${file}"
+
+    matrix=$(curl -s "${matrix}?ts=$(date +%s)" || true)
+
+    mkdir -p "$(diname "${cache}")"
+    echo "${matrix}" > ${cache}
+
+    if [[ "$(sha256sum ${cache})" != "${hash}  ${cache}" ]]; then
+        error 3 "tag '$2' checksum error."
+    fi
+else
+    cache="${HOME}/.zionrc/neo/cache/$2"
+    [[ -f "${cache}" ]] || error 3 "cache file '${cache}' not found."
+    matrix=$(cat "${cache}")
 fi
 
-echo "${cache}" | bash ${debug} -s -- "${@:2}"
+echo "${matrix}" | bash ${debug} -s -- "${@:2}"
