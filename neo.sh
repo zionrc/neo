@@ -97,8 +97,10 @@ shift $(( OPTIND-1 ))
 
 if [[ -z "$2" ]]; then
     info "(implicit) $1"
-    set -- __implict__ $1
+    set -- $1 __implict__
 fi
+
+echo "${@}"
 
 if [[ ${#2} -le 1 ]]; then
     error 2 "tag '${2}' is too short, type at least 2 letters."
